@@ -39,7 +39,7 @@ public class Server extends JFrame{
 
     public void startRunning(){
         try{
-            server = new ServerSocket(6780, 100);
+            server = new ServerSocket(6789, 100);
             while(true){
                 try{
                     //connect and have the conversation
