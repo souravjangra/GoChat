@@ -24,7 +24,7 @@ public class Client extends JFrame{
         userText.addActionListener(
             new ActionListener(){
                 public void actionPerformed(ActionEvent event){
-                    sendData(event.getActionCommand());
+                    sendMessage(event.getActionCommand());
                     userText.setText("");
                 }
             }
@@ -34,5 +34,87 @@ public class Client extends JFrame{
         add(new JScrollPane(chatWindow),BorderLayout.CENTER);
         setSize(300,150);
         setVisible(true);
+    }
+
+    // connect to the server
+    public void startRunning(){
+        try{
+            connectToServer();
+            setupStreams();
+            whileChatting();
+        }
+        catch(EOFException eofException){
+            showMessage("\n Client terminated connection!\n");
+            
+        }
+        catch(IOException ioException){
+            ioException.printStackTrace();
+
+        }
+        finally {
+            closeCrap();
+        }
+    }
+
+    // connect to server
+    private void connectToServer() throws IOException{
+        showMessage("Attempting connection... \n");
+        connection = new Socket(InetAddress.getByName(serverIP),6789);
+        showMessage("Connected to: " + connection.getInetAddress().getHostName());
+
+    }
+
+    // setup streams to send and recieve messages
+    private void setupStreams() throws IOException{
+        output = new ObjectOutputStream(connection.getOutputStream());
+        output.flush();
+        input = new ObjectInputStream(connection.getInputStream());
+        showMessage("\n Streams are now setted up! \n");
+
+    }
+
+    // while chatting with the server
+    private void whileChatting() throws IOException{
+        ableToType(true);
+        do{
+            try{
+                message = (String) input.readObject();
+                showMessage("\n" + message);
+            }
+            catch(ClassNotFoundException classNotFoundException){
+                showMessage("\n I don't know that object type!");
+            }
+        }
+        while(!message.equals("SERVER - END"));
+    }
+
+    // close the streams and sockets 
+    private void closeCrap(){
+        showMessage("\n closing crap down...");
+        ableToType(false);
+        try{
+            output.close();
+            input.close();
+            connection.close();
+
+        }
+        catch(IOException ioException){
+            ioException.printStackTrace();
+
+        }
+    }
+
+    // send messages to the server
+    private void sendMessage(String message){
+        try{
+            output.writeObject("CLIENT - "+message);
+            output.flush();
+            showMessage("\nCLIENT - " + message);
+
+        }
+        catch(IOException ioException){
+            chatWindow.append("\n something messed up sending message!");
+        }
+
     }
 }
