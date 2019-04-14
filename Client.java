@@ -117,4 +117,30 @@ public class Client extends JFrame{
         }
 
     }
+
+    // change or update chatWindow
+
+    private void showMessage(final String m){
+        SwingUtilities.invokeLater(
+            new Runnable(){
+                public void run() {
+                    chatWindow.append(m);
+                }
+            }
+        );
+    }
+
+    // gives user permission to type into text-box
+    private void ableToType(final boolean tof){
+        SwingUtilities.invokeLater(
+            new Runnable(){
+                public void run() {
+                    userText.setEditable(tof);
+                }
+            }
+        );
+        
+    }
+
+
 }
