@@ -116,10 +116,51 @@ public class Server extends JFrame{
             input.close();
             connection.close();
             
-        } catch (IOException ioException {
+        } catch (IOException ioException) {
             ioException.printStackTrace();
         }
     }
+
+    // send a message to Client
+    private void sendMessage(String message){
+        try {
+            
+            output.writeObject("SERVER -  " + message);
+            output.flush();
+            showMessage("\nSERVER - " + message);
+
+        } catch (IOException ioException) {
+            chatWindow.append("\n ERROR: DUDE I CANT SEND THAT MESSAGE!");
+        }
+    }
+
+    // updates chatWindow
+    private void showMessage(final String text){
+        SwingUtilities.invokeLater(
+            // creates a thread
+            new Runnable(){
+                public void run(){
+                    chatWindow.append(text);
+
+                }
+            }
+        );
+    }
+
+    // let the user type stuff into their chat-box
+    private void ableToType(final boolean tof){
+        SwingUtilities.invokeLater(
+            // creates a thread
+            new Runnable(){
+                public void run(){
+                    userText.setEditable(tof);
+
+                }
+            }
+        );
+
+    }
+    
 
     
 
