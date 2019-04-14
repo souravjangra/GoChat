@@ -43,6 +43,9 @@ public class Server extends JFrame{
             while(true){
                 try{
                     //connect and have the conversation
+                    waitForConnection();
+                    setupStreams();
+                    whileChatting();
                 }
                 catch(EOFException eofException)
                 {
@@ -58,5 +61,66 @@ public class Server extends JFrame{
             ioException.printStackTrace();
         }
     }
+
+    //wait for connection and then display connection information
+
+    private void waitForConnection() throws IOException{
+        showMessage("Waiting for someone to connect... \n");
+
+        connection = server.accept();
+
+        showMessage(" Now connected to " + connection.getInetAddress().getHostName());
+
+    }
+
+    // get stream to send and recieve data
+
+    private void setupStreams() throws IOException{
+
+        output = new ObjectOutputStream(connection.getOutputStream());
+        output.flush();
+        
+        // recieving messages from another computer
+        input = new ObjectInputStream(connection.getInputStream());
+        showMessage("\n Streams are now setup! \n");
+
+    
+    }
+
+    // during the chat conversation
+
+    private void whileChatting() throws IOException{
+        String message = "You are now connected to GoChat!";
+        sendMessage(message);
+        ableToType(true);
+
+        do{
+            try{
+                message = (String) input.readObject();
+                showMessage("\n" + message);
+            }
+            catch(ClassNotFoundException classNotFoundException){
+                showMessage("\n idk what are you saying!");
+            }
+        }
+        while(!message.equals("CLIENT - END"));
+
+    }
+
+    // close streams and sockets after you're done with chatting
+    private void closeCrap(){
+        showMessage("\n Closing connections... \n");
+        ableToType(false);
+        try {
+            output.close();
+            input.close();
+            connection.close();
+            
+        } catch (IOException ioException {
+            ioException.printStackTrace();
+        }
+    }
+
+    
 
 }
